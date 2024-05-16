@@ -1,0 +1,128 @@
+version: '3.9'
+
+x-kong-config:
+  &kong-env
+  KONG_DATABASE: postgres
+  KONG_PG_DATABASE: ${KONG_PG_DATABASE:-kong}
+  KONG_PG_HOST: db
+  KONG_PG_USER: ${KONG_PG_USER:-kong}
+  KONG_PG_PASSWORD_FILE: /run/secrets/kong_postgres_password
+
+volumes:
+  kong_data: {}
+  kong_prefix_vol:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  kong_tmp_vol:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  open-webui: {}
+
+services:
+  kong-migrations:
+    container_name: kong-migrations
+    image: "${KONG_DOCKER_TAG:-kong:latest}"
+    command: kong migrations bootstrap
+    depends_on:
+      - db
+    environment:
+      <<: *kong-env
+    secrets:
+      - kong_postgres_password
+    restart: on-failure
+
+  kong-migrations-up:
+    container_name: kong-migrations-up
+    image: "${KONG_DOCKER_TAG:-kong:latest}"
+    command: kong migrations up && kong migrations finish
+    depends_on:
+      - db
+    environment:
+      <<: *kong-env
+    secrets:
+      - kong_postgres_password
+    restart: on-failure
+
+  kong:
+    container_name: kong
+    image: "${KONG_DOCKER_TAG:-kong:latest}"
+    user: "${KONG_USER:-kong}"
+    environment:
+      <<: *kong-env
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_PROXY_LISTEN: "${KONG_PROXY_LISTEN:-0.0.0.0:8000, 0.0.0.0:8443 http2 ssl}"
+      KONG_ADMIN_LISTEN: "${KONG_ADMIN_LISTEN:-0.0.0.0:8001, 0.0.0.0:8444 http2 ssl}"
+      KONG_ADMIN_GUI_LISTEN: "${KONG_ADMIN_GUI_LISTEN:-0.0.0.0:8002}"
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_PREFIX: ${KONG_PREFIX:-/var/run/kong}
+    secrets:
+      - kong_postgres_password
+    ports:
+      - "${KONG_INBOUND_PROXY_LISTEN:-0.0.0.0}:80:8000/tcp"
+      - "${KONG_INBOUND_SSL_PROXY_LISTEN:-0.0.0.0}:443:8443/tcp"
+      - "127.0.0.1:8001:8001/tcp"
+      - "127.0.0.1:8444:8444/tcp"
+      - "127.0.0.1:8002:8002/tcp"
+    healthcheck:
+      test: [ "CMD", "kong", "health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+    # read_only: true
+    volumes:
+      - ./plugins/oidc:/usr/local/share/lua/5.1/kong/plugins/oidc # For plugin development only
+      - kong_prefix_vol:${KONG_PREFIX:-/var/run/kong}
+      - kong_tmp_vol:/tmp
+    security_opt:
+      - no-new-privileges
+
+  db:
+    container_name: kong-postgres
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: ${KONG_PG_DATABASE:-kong}
+      POSTGRES_USER: ${KONG_PG_USER:-kong}
+      POSTGRES_PASSWORD_FILE: /run/secrets/kong_postgres_password
+    secrets:
+      - kong_postgres_password    
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-d",
+          "${KONG_PG_DATABASE:-kong}",
+          "-U",
+          "${KONG_PG_USER:-kong}"
+        ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: always
+    stdin_open: true
+    tty: true
+    volumes:
+      - kong_data:/var/lib/postgresql/data
+
+  open-webui:
+    container_name: open-webui
+    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "${OPEN_WEBUI_PORT-3000}:8080"
+    environment:
+      - 'WEBUI_SECRET_KEY='
+# delegates the OAuth bit to a reverse proxy and doesn't handle OAuth inside of open-webui.
+# Trusted Email Header: WEBUI_AUTH_TRUSTED_EMAIL_HEADER can be used to authenticate users when used with an authenticating reverse proxy.
+      - 'WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email' # 
+    restart: unless-stopped
+
+secrets:
+  kong_postgres_password:
+    file: ./POSTGRES_PASSWORD
