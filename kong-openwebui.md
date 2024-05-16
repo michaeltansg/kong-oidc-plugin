@@ -13,6 +13,7 @@ To terminate a watch:
 ```bash
 kill -9 $(ps aux | grep '[f]swatch' | awk '{print $2}')
 ```
+The Kong OSS Manager is located at: `http://localhost:8002/`
 
 ## Setup Kong default services and routes for Open WebUI
 
@@ -39,9 +40,12 @@ To setup default service and routes: `sh 1.kong-openwebui-setup.sh`
 
 3. **Verify Secure Access**: Ensure that only authenticated users are able to access the application.
 
+Kong's NginX config: /var/run/kong/nginx-kong.conf
+
 Reference documents: 
 https://github.com/nokia/kong-oidc/blob/master/docs/kong_oidc_flow.png
 https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc
+https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow#request-an-access-token-with-a-client_secret
 https://docs.konghq.com/gateway/3.6.x/reference/nginx-directives/
 https://docs.konghq.com/gateway/3.6.x/reference/configuration/#nginx_user
 https://docs.konghq.com/gateway/3.6.x/reference/configuration/#nginx-injected-directives-section
