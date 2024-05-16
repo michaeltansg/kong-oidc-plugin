@@ -42,3 +42,6 @@ To setup default service and routes: `sh 1.kong-openwebui-setup.sh`
 Reference documents: 
 https://github.com/nokia/kong-oidc/blob/master/docs/kong_oidc_flow.png
 https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc
+https://docs.konghq.com/gateway/3.6.x/reference/nginx-directives/
+https://docs.konghq.com/gateway/3.6.x/reference/configuration/#nginx_user
+https://docs.konghq.com/gateway/3.6.x/reference/configuration/#nginx-injected-directives-section
