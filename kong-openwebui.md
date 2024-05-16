@@ -3,6 +3,17 @@
 `make restart` : use after modifying plugin file and then restart kong to pick up the changes made without rebuilding a new image.
 `make renew` : this destroys the kong container, rebuilds the kong oidc image and start kong
 
+Alternatively, you can use `fswatch` to observe for changes in plugin directory and restart the Kong service:
+```bash
+brew install fswatch
+fswatch -o ./plugins | xargs -n1 -I{} make restart &
+```
+
+To terminate a watch:
+```bash
+kill -9 $(ps aux | grep '[f]swatch' | awk '{print $2}')
+```
+
 ## Setup Kong default services and routes for Open WebUI
 
 To setup default service and routes: `sh 1.kong-openwebui-setup.sh`
