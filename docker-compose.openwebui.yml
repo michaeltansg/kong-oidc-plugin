@@ -120,7 +120,7 @@ services:
       - 'WEBUI_SECRET_KEY='
 # delegates the OAuth bit to a reverse proxy and doesn't handle OAuth inside of open-webui.
 # Trusted Email Header: WEBUI_AUTH_TRUSTED_EMAIL_HEADER can be used to authenticate users when used with an authenticating reverse proxy.
-      - 'WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email' # 
+      # - 'WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email' # 
     restart: unless-stopped
 
 secrets:
