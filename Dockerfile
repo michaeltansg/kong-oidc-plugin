@@ -7,6 +7,9 @@ USER root
 # Add custom plugin to the image
 COPY plugins/oidc /usr/local/share/lua/5.1/kong/plugins/oidc
 RUN luarocks install lua-resty-openidc 1.7.6-3
+# There are bug in lua-resty-session
+# https://github.com/zmartzone/lua-resty-openidc/pull/489#issuecomment-1761716455
+RUN luarocks remove lua-resty-session 4.0.5-1 --force
 
 # FOR DEBUGGING
 COPY kong.conf /etc/kong/
