@@ -28,4 +28,6 @@ To setup default service and routes: `sh 1.kong-openwebui-setup.sh`
 
 3. **Verify Secure Access**: Ensure that only authenticated users are able to access the application.
 
-Reference document: https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc
+Reference documents: 
+https://github.com/nokia/kong-oidc/blob/master/docs/kong_oidc_flow.png
+https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc
