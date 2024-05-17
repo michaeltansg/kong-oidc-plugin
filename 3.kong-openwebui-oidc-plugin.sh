@@ -33,7 +33,7 @@ tenant_id=<AZURE_ENTRA_TENANT_ID>
 
 curl -k -X POST http://localhost:8001/plugins \
     --data name=oidc \
-    --data instance_name=oidc \
+    --data "instance_name=open-webui-plugin-oidc" \
     --data service.id=$service_id \
     --data route.id=$route_id \
     --data config.client_id=$client_id \
