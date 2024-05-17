@@ -17,6 +17,8 @@ The Kong OSS Manager is located at: `http://localhost:8002/`
 
 ## Setup Kong default services and routes for Open WebUI
 
+Make a copy of `.env.example` and name it `.env`. Add the credentials required for Azure OIDC. 
+
 To setup default service and routes: `sh 1.kong-openwebui-setup.sh`
 [Optional] To add additional request transformer plugin: `sh 2.kong-openwebui-request-txformer.sh`
 
