@@ -6,29 +6,6 @@ local utils = require("kong.plugins.oidc.utils")
 local filter = require("kong.plugins.oidc.filter")
 local session = require("kong.plugins.oidc.session")
 
-local function print_table(t, indent)
-  indent = indent or ""
-  if type(t) == "table" then
-      for key, value in pairs(t) do
-          if type(value) == "table" then
-              ngx.log(ngx.DEBUG, indent .. tostring(key) .. ": ")
-              print_table(value, indent .. "  ")
-          else
-            ngx.log(ngx.DEBUG, indent .. tostring(key) .. ": " .. tostring(value))
-          end
-      end
-  else
-    ngx.log(ngx.DEBUG, indent .. tostring(t))
-  end
-end
-
-local function tables_to_string(table)
-  local result = {}
-  for key, value in pairs(table) do
-      table.insert(result, key .. ": " .. tostring(value))
-  end
-  return table.concat(result, ", ")
-end
 
 function OidcHandler:access(config)
   ngx.log(ngx.DEBUG, "##### ENTRY POINT: OidcHandler")
