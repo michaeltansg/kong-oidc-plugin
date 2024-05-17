@@ -17,7 +17,6 @@ COPY kong.conf /etc/kong/
 # Set environment variables to ensure Kong detects the custom plugin
 ENV KONG_PLUGINS="bundled,oidc"
 ENV KONG_LUA_PACKAGE_PATH="/usr/local/share/lua/5.1/kong/plugins/?.lua;;"
-ENV KONG_SESSION_SECRET: my_kong_session_secret
 
 # Ensure kong user is selected for image execution
 USER kong
