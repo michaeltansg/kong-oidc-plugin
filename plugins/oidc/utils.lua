@@ -136,6 +136,7 @@ end
 function M.injectAccessToken(accessToken, headerName, bearerToken)
   ngx.log(ngx.DEBUG, "Injecting " .. headerName)
   local token = accessToken
+  ngx.log(ngx.DEBUG, "access token " .. token)
   if (bearerToken) then
     token = formatAsBearerToken(token)
   end
@@ -145,6 +146,7 @@ end
 function M.injectIDToken(idToken, headerName)
   ngx.log(ngx.DEBUG, "Injecting " .. headerName)
   local tokenStr = cjson.encode(idToken)
+  ngx.log(ngx.DEBUG, "id token " .. tokenStr)
   kong.service.request.set_header(headerName, ngx.encode_base64(tokenStr))
 end
 
@@ -158,6 +160,7 @@ end
 function M.injectUser(user, headerName)
   ngx.log(ngx.DEBUG, "Injecting " .. headerName)
   local userinfo = cjson.encode(user)
+  ngx.log(ngx.DEBUG, "userinfo " .. userinfo)
   kong.service.request.set_header(headerName, ngx.encode_base64(userinfo))
 end
 
